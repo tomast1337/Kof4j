@@ -121,6 +121,41 @@ class FfiE2ETest {
         assertEquals("5", output, "abs(-5) must return 5 via libc");
     }
 
+    @Test
+    void libcPowAcceptsMultipleDoubleArguments(@TempDir Path dir) throws IOException {
+        Path src = dir.resolve("ffi-pow.kf");
+        Files.writeString(src, """
+                extern "libm.so.6" pow(Double x, Double y): Double
+
+                main() {
+                    println(pow(2.0, 3.0))
+                }
+                """);
+        Path out = dir.resolve("out-pow");
+        CompilationResult result = driver.compile(src, out, Target.JVM);
+        assertTrue(result.success(), "multi-argument FFI must compile: "
+                + result.diagnostics().getDiagnostics());
+        assertEquals("8.0", runJvm(out));
+    }
+
+    @Test
+    void libcVoidExternAcceptsIntegerArgument(@TempDir Path dir) throws IOException {
+        Path src = dir.resolve("ffi-void.kf");
+        Files.writeString(src, """
+                extern "libc.so.6" srand(Int seed): void
+
+                main() {
+                    srand(42)
+                    println("ok")
+                }
+                """);
+        Path out = dir.resolve("out-void");
+        CompilationResult result = driver.compile(src, out, Target.JVM);
+        assertTrue(result.success(), "void FFI must compile: "
+                + result.diagnostics().getDiagnostics());
+        assertEquals("ok", runJvm(out));
+    }
+
     private String runJava(Path outDir) throws IOException {
         return runJvm(outDir);
     }

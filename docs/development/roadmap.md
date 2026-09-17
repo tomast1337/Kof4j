@@ -914,7 +914,7 @@ domain (`INFRA00x`/`DATA00x`/`SCI00x`/`BIO00x`/`SECPQ`) + parity matrix;
 | # | Item | REAL measured state |
 |---|------|--------------------|
 | 2.1.1–2.1.3 | `extern` syntax + type-check + gaps `FFI001`/`FFI002` (never silent drop) | ✅ `Parser.java:192` (PARSE090), `ExternalFunctionNode`, `FfiE2ETest` |
-| 2.1.4 | **JVM** binding (FFM `java.lang.foreign`) | ✅ real `abs`/`atoi`(String→Int)/`sqrt`(Double→Double) via FFM |
+| 2.1.4 | **JVM** binding (FFM `java.lang.foreign`) | ✅ scalar multi-argument calls, C-string inputs, `void` returns, plus `abs`/`atoi`/`sqrt` via FFM |
 | 2.1.5 | **Native** binding (`dlsym`) | ❌ **honest gap `FFI001`** — `dlopen` segfaults in the raw binary (no glibc init); it is NOT "✅ real" |
 | 2.1.6 | struct/array marshalling | 🟡 String↔Int, Double↔Double (JVM); complete struct/array pending |
 | 2.1.7 | JS: gap `FFI002` | ✅ |

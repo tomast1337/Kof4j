@@ -445,17 +445,52 @@ public final class CompilerPipeline {
 
     // ── FFI (TIER 2.1.4) — binding suportado por target ──
     static boolean isExternBound(CompilerDriver driver, ExternalFunctionNode ext) {
-        if (ext.parameters().size() != 1) return false;
-        String p = ext.parameters().get(0).type();
-        String r = ext.returnType();
-        if (driver.target == Target.JVM) {
-            return (isIntType(r) && (isIntType(p) || isStringType(p)))
-                    || (isDoubleType(r) && isDoubleType(p));
+        if (driver.target == Target.JVM && ffiReturnKind(ext.returnType()) != null) {
+            return ext.parameters().stream().allMatch(p -> ffiArgumentKind(p.type()) != null);
         }
         // NATIVE: dlopen/dlsym segfaulta no binário nativo (glibc exige TLS
         // que o _start cru não inicializa) — bug registrado (known-bugs);
         // enquanto o backend não inicializa libc, extern nativo é FFI001 (R6).
         return false;
+    }
+
+    /** JVM FFM ABI kind for a Kof extern argument (S = UTF-8 C string). */
+    static String ffiArgumentKind(String t) {
+        if (isIntLikeType(t)) return "I";
+        if (isLongType(t)) return "J";
+        if (isFloatType(t)) return "F";
+        if (isDoubleType(t)) return "D";
+        if (isStringType(t)) return "S";
+        return null;
+    }
+
+    /** JVM FFM ABI return kind; String returns need pointer-to-string decoding and stay unsupported. */
+    static String ffiReturnKind(String t) {
+        if (isVoidType(t)) return "V";
+        String kind = ffiArgumentKind(t);
+        return switch (kind == null ? "" : kind) {
+            case "I", "J", "F", "D" -> ffiArgumentKind(t);
+            default -> null;
+        };
+    }
+
+    static boolean isIntLikeType(String t) {
+        return isIntType(t) || "Bool".equals(t) || "bool".equals(t)
+                || "Char".equals(t) || "char".equals(t)
+                || "Byte".equals(t) || "byte".equals(t)
+                || "Short".equals(t) || "short".equals(t);
+    }
+
+    static boolean isLongType(String t) {
+        return "Long".equals(t) || "long".equals(t);
+    }
+
+    static boolean isFloatType(String t) {
+        return "Float".equals(t) || "float".equals(t);
+    }
+
+    static boolean isVoidType(String t) {
+        return "Void".equals(t) || "void".equals(t);
     }
 
     static boolean isIntType(String t) {

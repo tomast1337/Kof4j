@@ -62,6 +62,8 @@ public final class JvmOpCollections {
                 emitUnboxIfPrimitive(mv, kc.returnType());
             } else if ("kof_list_reduce".equals(kc.methodName()) && isPrimitiveType(kc.returnType())) {
                 emitUnboxIfPrimitive(mv, kc.returnType());
+            } else if ("kof_ffi_call".equals(kc.methodName()) && isPrimitiveType(kc.returnType())) {
+                emitUnboxIfPrimitive(mv, kc.returnType());
             }
         }
     }
