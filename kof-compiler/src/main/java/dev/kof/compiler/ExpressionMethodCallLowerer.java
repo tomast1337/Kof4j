@@ -84,6 +84,7 @@ if (mc.receiver() == null && driver.externSignatures.containsKey(mc.methodName()
         for (var p : ext.parameters()) signature.append(CompilerPipeline.ffiArgumentKind(p.type()));
         signature.append("->").append(CompilerPipeline.ffiReturnKind(ext.returnType()));
         boolean returnsVoid = CompilerPipeline.isVoidType(ext.returnType());
+        boolean returnsBool = CompilerPipeline.isBoolType(ext.returnType());
         Type retType = returnsVoid ? Type.PrimitiveType.VOID
                 : CompilerTypes.toType(ext.returnType(), driver.currentUnit);
         ops.add(new KofLoadLiteral(BuiltinTypes.STRING, ext.library() != null ? ext.library() : ""));
@@ -91,7 +92,8 @@ if (mc.receiver() == null && driver.externSignatures.containsKey(mc.methodName()
         ops.add(new KofLoadLiteral(BuiltinTypes.STRING, signature.toString()));
         ops.add(new KofLoadLocal(objectArrayType, arraySlot));
         ops.add(new KofCall(new Type.ClassType("kof", "ffi", List.of()),
-                returnsVoid ? "kof_ffi_call_void" : "kof_ffi_call",
+                returnsVoid ? "kof_ffi_call_void"
+                        : returnsBool ? "kof_ffi_call_bool" : "kof_ffi_call",
                 List.of(BuiltinTypes.STRING, BuiltinTypes.STRING, BuiltinTypes.STRING, objectArrayType),
                 retType, KofCallKind.FUNCTION));
         return localIdx;

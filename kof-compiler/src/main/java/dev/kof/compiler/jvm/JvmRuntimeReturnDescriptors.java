@@ -16,6 +16,7 @@ public final class JvmRuntimeReturnDescriptors {
             case "kof_ffi_dd" -> "D";
             case "kof_ffi_call" -> "Ljava/lang/Object;";
             case "kof_ffi_call_void" -> "V";
+            case "kof_ffi_call_bool" -> "Z";
             case "kof_json_decode_long", "kof_now" -> "J";
             case "kof_json_decode_float" -> "F";
             case "kof_json_decode_double" -> "D";

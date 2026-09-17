@@ -87,6 +87,13 @@ final class JvmFfiRuntime {
                     kof_ffi_call0(lib, name, signature, args);
                 }
 
+                public static boolean kof_ffi_call_bool(String lib, String name, String signature,
+                        java.lang.Object[] args) {
+                    java.lang.Object result = kof_ffi_call0(lib, name, signature, args);
+                    if (result instanceof java.lang.Boolean b) return b;
+                    return ((java.lang.Number) result).intValue() != 0;
+                }
+
                 private static java.lang.Object kof_ffi_call0(String lib, String name, String signature,
                         java.lang.Object[] args) {
                     // Keep the loaded library alive for the process lifetime. A
