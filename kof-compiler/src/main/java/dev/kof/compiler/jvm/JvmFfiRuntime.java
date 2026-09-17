@@ -111,6 +111,10 @@ final class JvmFfiRuntime {
                                     else if (value instanceof java.lang.Byte || value instanceof java.lang.Short)
                                         value = ((java.lang.Number) value).intValue();
                                 }
+                                case 'B' -> {
+                                    layouts.add(java.lang.foreign.ValueLayout.JAVA_BOOLEAN);
+                                    if (value instanceof java.lang.Number n) value = n.intValue() != 0;
+                                }
                                 case 'J' -> layouts.add(java.lang.foreign.ValueLayout.JAVA_LONG);
                                 case 'F' -> layouts.add(java.lang.foreign.ValueLayout.JAVA_FLOAT);
                                 case 'D' -> layouts.add(java.lang.foreign.ValueLayout.JAVA_DOUBLE);
@@ -142,6 +146,7 @@ final class JvmFfiRuntime {
                 private static java.lang.foreign.ValueLayout returnLayout(String kind) {
                     return switch (kind) {
                         case "I" -> java.lang.foreign.ValueLayout.JAVA_INT;
+                        case "B" -> java.lang.foreign.ValueLayout.JAVA_BOOLEAN;
                         case "J" -> java.lang.foreign.ValueLayout.JAVA_LONG;
                         case "F" -> java.lang.foreign.ValueLayout.JAVA_FLOAT;
                         case "D" -> java.lang.foreign.ValueLayout.JAVA_DOUBLE;

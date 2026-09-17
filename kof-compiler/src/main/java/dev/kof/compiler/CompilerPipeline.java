@@ -456,6 +456,7 @@ public final class CompilerPipeline {
 
     /** JVM FFM ABI kind for a Kof extern argument (S = UTF-8 C string). */
     static String ffiArgumentKind(String t) {
+        if (isBoolType(t)) return "B";
         if (isIntLikeType(t)) return "I";
         if (isLongType(t)) return "J";
         if (isFloatType(t)) return "F";
@@ -469,16 +470,19 @@ public final class CompilerPipeline {
         if (isVoidType(t)) return "V";
         String kind = ffiArgumentKind(t);
         return switch (kind == null ? "" : kind) {
-            case "I", "J", "F", "D" -> ffiArgumentKind(t);
+            case "B", "I", "J", "F", "D" -> ffiArgumentKind(t);
             default -> null;
         };
     }
 
     static boolean isIntLikeType(String t) {
-        return isIntType(t) || "Bool".equals(t) || "bool".equals(t)
-                || "Char".equals(t) || "char".equals(t)
+        return isIntType(t) || "Char".equals(t) || "char".equals(t)
                 || "Byte".equals(t) || "byte".equals(t)
                 || "Short".equals(t) || "short".equals(t);
+    }
+
+    static boolean isBoolType(String t) {
+        return "Bool".equals(t) || "bool".equals(t);
     }
 
     static boolean isLongType(String t) {
