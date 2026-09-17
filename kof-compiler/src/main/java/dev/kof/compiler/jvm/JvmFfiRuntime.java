@@ -89,7 +89,11 @@ final class JvmFfiRuntime {
 
                 private static java.lang.Object kof_ffi_call0(String lib, String name, String signature,
                         java.lang.Object[] args) {
-                    try (java.lang.foreign.Arena arena = java.lang.foreign.Arena.ofConfined()) {
+                    // Keep the loaded library alive for the process lifetime. A
+                    // confined arena here would unload raylib after each call,
+                    // invalidating its global GL function table before CloseWindow.
+                    java.lang.foreign.Arena arena = java.lang.foreign.Arena.global();
+                    try {
                         int arrow = signature.indexOf("->");
                         if (arrow < 0) throw new IllegalArgumentException("invalid FFI signature: " + signature);
                         String argKinds = signature.substring(0, arrow);
