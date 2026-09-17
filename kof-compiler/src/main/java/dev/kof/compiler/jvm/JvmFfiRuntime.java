@@ -136,7 +136,12 @@ final class JvmFfiRuntime {
                                 : java.lang.foreign.FunctionDescriptor.of(returnLayout(retKind), layoutArray);
                         java.lang.invoke.MethodHandle handle = java.lang.foreign.Linker.nativeLinker()
                                 .downcallHandle(lookup.find(name).orElseThrow(), fd);
-                        return handle.invokeWithArguments(values);
+                        java.lang.Object result = handle.invokeWithArguments(values);
+                        if ("B".equals(retKind)) {
+                            if (result instanceof java.lang.Boolean) return result;
+                            return ((java.lang.Number) result).intValue() != 0;
+                        }
+                        return result;
                     } catch (Throwable t) {
                         throw new RuntimeException("kof_ffi_call: " + lib + "::" + name
                                 + " (" + signature + ") failed: " + t.getMessage(), t);
